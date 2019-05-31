@@ -1,0 +1,24 @@
+#! /bin/bash
+ 
+logs_path="/usr/local/nginx/logs/"
+access_log_name="access.log"
+error_log_name="error.log"
+pid_path="/usr/local/nginx/logs/nginx.pid"
+ 
+#日志文件集中存放的路径
+access_logs_path="/usr/local/nginx/logs/access_log/"
+error_logs_path="/usr/local/nginx/logs/error_log/"
+
+#移动日志
+mv ${logs_path}${access_log_name} ${access_logs_path}$(date +"%Y-%m-%d")_${access_log_name}
+mv ${logs_path}${error_log_name} ${error_logs_path}$(date +"%Y-%m-%d")_${error_log_name} 
+
+#生成新的access.log文件
+kill -USR1 `cat ${pid_path}`
+ 
+#删除一个月之前的日志
+cd ${access_logs_path}
+find . -ctime +30 -name "*access.log" |xargs rm -f
+cd ${error_logs_path}
+find . -ctime +30 -name "*error.log" |xargs rm -f
+exit 0 
